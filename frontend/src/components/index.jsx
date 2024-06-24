@@ -270,9 +270,9 @@ const VoiceInput = () => {
                 cursor: "pointer",
                 transition: "background-color 0.3s ease",
               }}
-              onClick={startListening}
+              onClick={!isListening ? startListening : stopListening}
             >
-              Start Listening
+              {!isListening ? "Start Listening" : "Stop Listening"}
             </button>
           </div>
 
@@ -294,7 +294,7 @@ const VoiceInput = () => {
           </div> */}
 
           {isListening ? <div>Your browser is currently listening</div> : null}
-          {text}
+          {/* {text} */}
         </>
       ) : (
         <h1>Your browser has no speech recognition support</h1>

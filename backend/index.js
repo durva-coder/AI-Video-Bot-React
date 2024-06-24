@@ -13,6 +13,7 @@ const arr = [
   "hi there",
   "hi",
   "howdy",
+  "hi how are you",
 ];
 
 app.post("/response", (req, res) => {

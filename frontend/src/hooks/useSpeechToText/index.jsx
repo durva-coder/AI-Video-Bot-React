@@ -231,13 +231,15 @@ const useSpeechRecognition = () => {
   const [text, setText] = useState("");
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [responseData, setResponseData] = useState("");
 
   const onResult = async (event) => {
     console.log("onresult event ", event);
     const length = event.results.length;
     console.log("length", length - 1);
     let newText = event.results[length - 1][0].transcript;
-    console.log("new tex", event.results[0][length - 1]);
+    console.log("new tex", event.results[length - 1][0].transcript);
     // for (let i = 0; i < event.results.length; i++) {
     //   newText += event.results[i][0].transcript;
     // }
@@ -254,7 +256,9 @@ const useSpeechRecognition = () => {
       });
 
       const responseData = await response.json();
-      textToSpeech(responseData.text);
+      setResponseData(responseData.text);
+      // textToSpeech(responseData.text);
+      setIsSpeaking(true);
     } catch (error) {
       console.error("Error calling backend API:", error);
     }
@@ -374,6 +378,10 @@ const useSpeechRecognition = () => {
     startListening,
     stopListening,
     hasRecognitionSupport: !!recognition,
+    isSpeaking,
+    setIsSpeaking,
+    responseData,
+    setResponseData,
   };
 };
 
