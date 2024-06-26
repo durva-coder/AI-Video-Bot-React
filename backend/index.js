@@ -12,17 +12,6 @@ const db = require("../backend/models");
 // create Main Model
 const VideoBot = db.videoBot;
 
-// const arr = [
-//   "hello",
-//   "hey",
-//   "hey there",
-//   "hello there",
-//   "hi there",
-//   "hi",
-//   "howdy",
-//   "hi how are you",
-// ];
-
 function extractDataValues(data) {
   return data.map((item) => item.dataValues);
 }
@@ -61,13 +50,6 @@ app.post("/response", async (req, res) => {
 
   const randomDescription = getRandomDescription(text, extractedDataValues);
 
-  // let responseText;
-
-  // if (arr.includes(text.toLowerCase().trim())) {
-  //   responseText = "Hey there! How can I help you today?";
-  // } else {
-  //   responseText = "I don't know. Can you ask another question? Thank you!";
-  // }
   return res.status(200).json({
     text: randomDescription,
   });

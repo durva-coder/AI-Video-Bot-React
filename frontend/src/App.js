@@ -5,7 +5,6 @@ import { Canvas } from "@react-three/fiber";
 import { Experience } from "./components/Experience";
 
 function App() {
-  // const [reply, setReply] = useState("");
   return (
     <>
       {/* <div className="App"> */}
@@ -24,9 +23,6 @@ function App() {
       </Canvas>
       {/* </div> */}
       <VoiceInput></VoiceInput>
-      {/* <div className="reply-container">
-        <p>Reply: {reply}</p>
-      </div> */}
     </>
   );
 }
