@@ -29,16 +29,17 @@ const useSpeechRecognition = () => {
     setText(newText);
 
     try {
-      const response = await fetch("http://localhost:7777/response", {
+      const response = await fetch("http://localhost:7777/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: newText }),
+        body: JSON.stringify({ prompt: newText }),
       });
 
       const responseData = await response.json();
-      setResponseData(responseData.text);
+      console.log("esponseData.data", responseData.data);
+      setResponseData(responseData.data);
       // textToSpeech(responseData.text);
       setIsSpeaking(true);
     } catch (error) {
