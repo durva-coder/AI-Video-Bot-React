@@ -6,10 +6,12 @@ Command: npx gltfjsx@6.2.18 public/models/667909a260bbb5682042293a.glb -o src/co
 import { useGLTF } from "@react-three/drei";
 import { useFrame, useLoader } from "@react-three/fiber";
 // import { useControls } from "leva";
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, useState } from "react";
 import useSpeechRecognition from "../hooks/useSpeechToText/index";
 import * as THREE from "three";
-// import { useState } from "react";
+
+import axios from "axios";
+import { Buffer } from "buffer";
 
 const corresponding = {
   A: "viseme_PP",
@@ -27,7 +29,156 @@ export function Avatar(props) {
   const { text, isListening, isSpeaking, responseData, setResponseData } =
     useSpeechRecognition(); // Correct the import path to useSpeechRecognition
 
+  const [audioBuffer, setAudioBuffer] = useState(null);
+  const [alignment, setAlignment] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const data = {
+      text: "Born and raised in the charming south, I can add a touch of sweet southern hospitality to your audiobooks and podcasts",
+      model_id: "eleven_multilingual_v2",
+      voice_settings: {
+        stability: 0.5,
+        similarity_boost: 0.75,
+      },
+    };
+
+    axios
+      .post("http://localhost:7777/api", data)
+      .then((response) => {
+        if (response.status !== 200) {
+          setError(
+            `Error encountered, status: ${response.status}, content: ${response.data}`
+          );
+          return;
+        }
+
+        const audioBase64 = response.data.audio_base64;
+        const audioBuffer = Buffer.from(audioBase64, "base64");
+        setAudioBuffer(audioBuffer);
+        setAlignment(response.data.alignment);
+      })
+      .catch((error) => {
+        setError(error.message);
+      });
+  }, []);
+
+  //   const [audioBuffer, setAudioBuffer] = useState(null);
+  //   const [alignment, setAlignment] = useState(null);
+  //   const [error, setError] = useState(null);
+
+  //   const VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; // Rachel
+  //   const XI_API_KEY = "sk_3576d5ff2313129c03dcbe17e309d9969a9d6bc5b39e2a56";
+
+  //   const url = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}/with-timestamps`;
+
+  //   const headers = {
+  //     "Content-Type": "application/json",
+  //     // "xi-api-key": XI_API_KEY,
+  //     Authorization: `Bearer ${XI_API_KEY}`,
+  //     "Access-Control-Allow-Origin": "*",
+  //   };
+
+  //   const data = {
+  //     text: "Born and raised in the charming south",
+  //     model_id: "eleven_multilingual_v2",
+  //     voice_settings: {
+  //       stability: 0.5,
+  //       similarity_boost: 0.75,
+  //     },
+  //   };
+
+  //   useEffect(() => {
+  //     axios
+  //       .post(url, data, { headers })
+  //       .then((response) => {
+  //         if (response.status !== 200) {
+  //           setError(
+  //             `Error encountered, status: ${response.status}, content: ${response.data}`
+  //           );
+  //           return;
+  //         }
+
+  //         const audioBase64 = response.data.audio_base64;
+  //         const audioBuffer = Buffer.from(audioBase64, "base64");
+  //         setAudioBuffer(audioBuffer);
+  //         setAlignment(response.data.alignment);
+  //       })
+  //       .catch((error) => {
+  //         setError(error.message);
+  //       });
+  //   }, []);
+
   let script;
+
+  const synth = window.speechSynthesis;
+  const utterance = new SpeechSynthesisUtterance(text);
+
+  // Function to map phonemes to visemes (simulated)
+  function mapPhonemeToViseme(phoneme) {
+    switch (phoneme.toLowerCase()) {
+      case "p":
+      case "b":
+      case "m":
+        return "viseme_PP";
+      case "f":
+      case "v":
+        return "viseme_FF";
+      case "th":
+      case "d":
+      case "t":
+      case "n":
+      case "l":
+        return "viseme_DD";
+      case "s":
+      case "z":
+        return "viseme_SS";
+      case "ch":
+      case "j":
+        return "viseme_CH";
+      case "sh":
+        return "viseme_SH";
+      case "r":
+        return "viseme_RR";
+      case "k":
+      case "g":
+        return "viseme_KK";
+      case "ng":
+        return "viseme_NG";
+      case "w":
+        return "viseme_WW";
+      case "y":
+        return "viseme_YY";
+      case "h":
+        return "viseme_HH";
+      case "ee":
+        return "viseme_EE";
+      case "ih":
+        return "viseme_IH";
+      case "ah":
+        return "viseme_AA";
+      case "oo":
+        return "viseme_OO";
+      case "uh":
+        return "viseme_UH";
+      default:
+        return "viseme_default";
+    }
+  }
+
+  function synthesizeTextWithVisemes(text) {
+    utterance.text = text;
+    synth.speak(utterance);
+
+    // Event listener for getting speech synthesis events
+    utterance.addEventListener("boundary", (event) => {
+      const phoneme =
+        event.charIndex !== undefined ? text[event.charIndex] : "";
+      const viseme = mapPhonemeToViseme(phoneme);
+      console.log(`Current phoneme: ${phoneme}, Viseme: ${viseme}`);
+      // Here you can use viseme to trigger visual animations or store data as needed
+    });
+  }
 
   const arr = [
     "hello",
@@ -58,31 +209,30 @@ export function Avatar(props) {
     }
   }
 
-  // console.log(script);
-
   const audio = useMemo(() => new Audio(`/audios/${script}.mp3`), [script]);
-
-  // console.log(audio);
 
   useEffect(() => {
     if (isSpeaking) {
-      audio.play();
+      // audio.play();
+      synthesizeTextWithVisemes(responseData);
       // setReply(responseData);
     } else {
-      audio.pause();
+      // audio.pause();
       // setReply("");
       setResponseData("");
     }
   }, [isSpeaking, script, responseData]);
 
   const { nodes, materials } = useGLTF("/models/667909a260bbb5682042293a.glb");
+  synthesizeTextWithVisemes(responseData);
+
+  console.log(" synthesizeTextWithVisemes(responseData);", responseData);
   const jsonFile = useLoader(THREE.FileLoader, `audios/${script}.json`);
   const lipsync = JSON.parse(jsonFile);
 
-  // console.log(jsonFile);
+  console.log("lipsync", lipsync);
 
   useFrame(() => {
-    // console.log("use frame", audio.currentTime);
     const currentAudioTime = audio.currentTime;
 
     Object.values(corresponding).forEach((value) => {
@@ -102,7 +252,6 @@ export function Avatar(props) {
         currentAudioTime >= mouthCue.start &&
         currentAudioTime <= mouthCue.end
       ) {
-        // console.log(mouthCue.value);
         nodes.Wolf3D_Head.morphTargetInfluences[
           nodes.Wolf3D_Head.morphTargetDictionary[corresponding[mouthCue.value]]
         ] = 1;
@@ -185,3 +334,128 @@ export function Avatar(props) {
 }
 
 useGLTF.preload("/models/667909a260bbb5682042293a.glb");
+
+// import React, { useState, useEffect } from "react";
+// import { Canvas } from "@react-three/fiber";
+// import { useGLTF } from "@react-three/drei";
+// import axios from "axios";
+// import { Buffer } from "buffer";
+
+// export const Avatar = () => {
+//   const { nodes, materials } = useGLTF("/models/667909a260bbb5682042293a.glb");
+
+//   const [audioBuffer, setAudioBuffer] = useState(null);
+//   const [alignment, setAlignment] = useState(null);
+//   const [error, setError] = useState(null);
+
+//   const VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; // Rachel
+//   const XI_API_KEY = "sk_3576d5ff2313129c03dcbe17e309d9969a9d6bc5b39e2a56";
+
+//   const url = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}/with-timestamps`;
+
+//   const headers = {
+//     "Content-Type": "application/json",
+//     "xi-api-key": XI_API_KEY,
+//   };
+
+//   const data = {
+//     text: "Born and raised in the charming south, I can add a touch of sweet southern hospitality to your audiobooks and podcasts",
+//     model_id: "eleven_multilingual_v2",
+//     voice_settings: {
+//       stability: 0.5,
+//       similarity_boost: 0.75,
+//     },
+//   };
+
+//   useEffect(() => {
+//     axios
+//       .post(url, data, { headers })
+//       .then((response) => {
+//         if (response.status !== 200) {
+//           setError(
+//             `Error encountered, status: ${response.status}, content: ${response.data}`
+//           );
+//           return;
+//         }
+
+//         const audioBase64 = response.data.audio_base64;
+//         const audioBuffer = Buffer.from(audioBase64, "base64");
+//         setAudioBuffer(audioBuffer);
+//         setAlignment(response.data.alignment);
+//       })
+//       .catch((error) => {
+//         setError(error.message);
+//       });
+//   }, []);
+
+//   return (
+//     <>
+//       {error && <div>Error: {error}</div>}
+//       {!audioBuffer && <div>Loading...</div>}
+//       <Canvas>
+//         <group>
+//           <primitive object={nodes.Hips} />
+//           <skinnedMesh
+//             geometry={nodes.Wolf3D_Hair.geometry}
+//             material={materials.Wolf3D_Hair}
+//             skeleton={nodes.Wolf3D_Hair.skeleton}
+//           />
+//           <skinnedMesh
+//             geometry={nodes.Wolf3D_Outfit_Top.geometry}
+//             material={materials.Wolf3D_Outfit_Top}
+//             skeleton={nodes.Wolf3D_Outfit_Top.skeleton}
+//           />
+//           <skinnedMesh
+//             geometry={nodes.Wolf3D_Outfit_Bottom.geometry}
+//             material={materials.Wolf3D_Outfit_Bottom}
+//             skeleton={nodes.Wolf3D_Outfit_Bottom.skeleton}
+//           />
+//           <skinnedMesh
+//             geometry={nodes.Wolf3D_Outfit_Footwear.geometry}
+//             material={materials.Wolf3D_Outfit_Footwear}
+//             skeleton={nodes.Wolf3D_Outfit_Footwear.skeleton}
+//           />
+//           <skinnedMesh
+//             geometry={nodes.Wolf3D_Body.geometry}
+//             material={materials.Wolf3D_Body}
+//             skeleton={nodes.Wolf3D_Body.skeleton}
+//           />
+//           <skinnedMesh
+//             name="EyeLeft"
+//             geometry={nodes.EyeLeft.geometry}
+//             material={materials.Wolf3D_Eye}
+//             skeleton={nodes.EyeLeft.skeleton}
+//             morphTargetDictionary={nodes.EyeLeft.morphTargetDictionary}
+//             morphTargetInfluences={nodes.EyeLeft.morphTargetInfluences}
+//           />
+//           <skinnedMesh
+//             name="EyeRight"
+//             geometry={nodes.EyeRight.geometry}
+//             material={materials.Wolf3D_Eye}
+//             skeleton={nodes.EyeRight.skeleton}
+//             morphTargetDictionary={nodes.EyeRight.morphTargetDictionary}
+//             morphTargetInfluences={nodes.EyeRight.morphTargetInfluences}
+//           />
+//           <skinnedMesh
+//             name="Wolf3D_Head"
+//             geometry={nodes.Wolf3D_Head.geometry}
+//             material={materials.Wolf3D_Skin}
+//             skeleton={nodes.Wolf3D_Head.skeleton}
+//             morphTargetDictionary={nodes.Wolf3D_Head.morphTargetDictionary}
+//             morphTargetInfluences={nodes.Wolf3D_Head.morphTargetInfluences}
+//           />
+//           <skinnedMesh
+//             name="Wolf3D_Teeth"
+//             geometry={nodes.Wolf3D_Teeth.geometry}
+//             material={materials.Wolf3D_Teeth}
+//             skeleton={nodes.Wolf3D_Teeth.skeleton}
+//             morphTargetDictionary={nodes.Wolf3D_Teeth.morphTargetDictionary}
+//             morphTargetInfluences={nodes.Wolf3D_Teeth.morphTargetInfluences}
+//           />
+//         </group>
+//       </Canvas>
+//     </>
+//   );
+// };
+
+// useGLTF.preload("/models/667909a260bbb5682042293a.glb");

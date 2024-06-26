@@ -259,7 +259,13 @@ const VoiceInput = () => {
     <div>
       {hasRecognitionSupport ? (
         <>
-          <div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <button
               style={{
                 backgroundColor: isListening ? "#d62d20" : "#008744",
@@ -269,6 +275,8 @@ const VoiceInput = () => {
                 borderRadius: "5px",
                 cursor: "pointer",
                 transition: "background-color 0.3s ease",
+                height: "50px",
+                fontSize: "18px",
               }}
               onClick={!isListening ? startListening : stopListening}
             >

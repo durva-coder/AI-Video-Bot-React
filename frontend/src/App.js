@@ -10,7 +10,12 @@ function App() {
     <>
       {/* <div className="App"> */}
       <Canvas
-        style={{ height: "90vh", width: "90vw" }}
+        style={{
+          height: "90vh",
+          width: "90vw",
+          padding: "1%",
+          paddingLeft: "90px",
+        }}
         shadows
         camera={{ position: [0, 0, 8], fov: 42 }}
       >
