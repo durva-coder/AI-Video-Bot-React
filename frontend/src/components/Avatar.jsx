@@ -470,6 +470,185 @@ Command: npx gltfjsx@6.2.18 public/models/667909a260bbb5682042293a.glb -o src/co
 // // Preload 3D model
 // useGLTF.preload("/models/667909a260bbb5682042293a.glb");
 
+// import React, { useState, useEffect, useRef } from "react";
+// import { useGLTF } from "@react-three/drei";
+// import { useFrame } from "@react-three/fiber";
+// import useSpeechRecognition from "../hooks/useSpeechToText/index";
+
+// const corresponding = {
+//   A: "viseme_PP",
+//   B: "viseme_kk",
+//   C: "viseme_I",
+//   D: "viseme_AA",
+//   E: "viseme_O",
+//   F: "viseme_U",
+//   G: "viseme_FF",
+//   H: "viseme_TH",
+//   X: "viseme_PP",
+// };
+
+// export function Avatar(props) {
+//   const { responseData } = useSpeechRecognition();
+//   const [cues, setCues] = useState([]);
+//   const utteranceRef = useRef(null);
+//   const startTimeRef = useRef(0);
+//   const speechSynthesisRef = useRef(null);
+
+//   useEffect(() => {
+//     if ("speechSynthesis" in window) {
+//       speechSynthesisRef.current = window.speechSynthesis;
+//     }
+//   }, []);
+
+//   useEffect(() => {
+//     if (responseData) {
+//       const utterance = new SpeechSynthesisUtterance(responseData);
+//       utteranceRef.current = utterance;
+//       const generatedCues = [];
+
+//       utterance.onboundary = (event) => {
+//         if (event.name === "word") {
+//           const start = event.elapsedTime * 1000; // Convert to milliseconds
+//           const end = (event.elapsedTime + 0.2) * 1000; // Convert to milliseconds
+//           const value = responseData
+//             .substring(event.charIndex, event.charIndex + event.charLength)
+//             .trim();
+//           const viseme = corresponding[value.charAt(0).toUpperCase()] || "X";
+
+//           generatedCues.push({
+//             value: viseme,
+//             start,
+//             end,
+//           });
+//         }
+//       };
+
+//       speechSynthesisRef.current.speak(utterance);
+
+//       utterance.onend = () => {
+//         setCues(generatedCues);
+//         console.log("Cues:", generatedCues);
+//       };
+//     }
+//   }, [responseData]);
+
+//   const { nodes, materials } = useGLTF("/models/667909a260bbb5682042293a.glb");
+
+//   useFrame(() => {
+//     console.log("(speechSynthesisRef.current", speechSynthesisRef.current);
+//     if (speechSynthesisRef.current && speechSynthesisRef.current.speaking) {
+//       const currentTime = speechSynthesisRef.current.currentTime * 1000;
+
+//       Object.values(corresponding).forEach((value) => {
+//         nodes.Wolf3D_Head.morphTargetInfluences[
+//           nodes.Wolf3D_Head.morphTargetDictionary[value]
+//         ] = 0;
+
+//         nodes.Wolf3D_Teeth.morphTargetInfluences[
+//           nodes.Wolf3D_Teeth.morphTargetDictionary[value]
+//         ] = 0;
+//       });
+
+//       for (let i = 0; i < cues.length; i++) {
+//         const mouthCue = cues[i];
+//         const startTime = mouthCue.start;
+//         const endTime = mouthCue.end;
+
+//         console.log("currentTime", currentTime);
+//         console.log("startTime", startTime);
+//         console.log("currentTime >= startTime", currentTime >= startTime);
+//         console.log("currentTime <= endTime", currentTime <= endTime);
+//         console.log(
+//           "currentTime >= startTime && currentTime <= endTime",
+//           currentTime >= startTime && currentTime <= endTime
+//         );
+
+//         if (currentTime >= startTime && currentTime <= endTime) {
+//           console.log(currentTime);
+//           const viseme = mouthCue.value;
+
+//           nodes.Wolf3D_Head.morphTargetInfluences[
+//             nodes.Wolf3D_Head.morphTargetDictionary[viseme]
+//           ] = 1;
+
+//           nodes.Wolf3D_Teeth.morphTargetInfluences[
+//             nodes.Wolf3D_Teeth.morphTargetDictionary[viseme]
+//           ] = 1;
+//           break;
+//         }
+//       }
+//     }
+//   });
+
+//   return (
+//     <group {...props} dispose={null}>
+//       <primitive object={nodes.Hips} />
+//       <skinnedMesh
+//         geometry={nodes.Wolf3D_Hair.geometry}
+//         material={materials.Wolf3D_Hair}
+//         skeleton={nodes.Wolf3D_Hair.skeleton}
+//       />
+//       <skinnedMesh
+//         geometry={nodes.Wolf3D_Outfit_Top.geometry}
+//         material={materials.Wolf3D_Outfit_Top}
+//         skeleton={nodes.Wolf3D_Outfit_Top.skeleton}
+//       />
+//       <skinnedMesh
+//         geometry={nodes.Wolf3D_Outfit_Bottom.geometry}
+//         material={materials.Wolf3D_Outfit_Bottom}
+//         skeleton={nodes.Wolf3D_Outfit_Bottom.skeleton}
+//       />
+//       <skinnedMesh
+//         geometry={nodes.Wolf3D_Outfit_Footwear.geometry}
+//         material={materials.Wolf3D_Outfit_Footwear}
+//         skeleton={nodes.Wolf3D_Outfit_Footwear.skeleton}
+//       />
+//       <skinnedMesh
+//         geometry={nodes.Wolf3D_Body.geometry}
+//         material={materials.Wolf3D_Body}
+//         skeleton={nodes.Wolf3D_Body.skeleton}
+//       />
+//       <skinnedMesh
+//         name="EyeLeft"
+//         geometry={nodes.EyeLeft.geometry}
+//         material={materials.Wolf3D_Eye}
+//         skeleton={nodes.EyeLeft.skeleton}
+//         morphTargetDictionary={nodes.EyeLeft.morphTargetDictionary}
+//         morphTargetInfluences={nodes.EyeLeft.morphTargetInfluences}
+//       />
+//       <skinnedMesh
+//         name="EyeRight"
+//         geometry={nodes.EyeRight.geometry}
+//         material={materials.Wolf3D_Eye}
+//         skeleton={nodes.EyeRight.skeleton}
+//         morphTargetDictionary={nodes.EyeRight.morphTargetDictionary}
+//         morphTargetInfluences={nodes.EyeRight.morphTargetInfluences}
+//       />
+//       <skinnedMesh
+//         name="Wolf3D_Head"
+//         geometry={nodes.Wolf3D_Head.geometry}
+//         material={materials.Wolf3D_Skin}
+//         skeleton={nodes.Wolf3D_Head.skeleton}
+//         morphTargetDictionary={nodes.Wolf3D_Head.morphTargetDictionary}
+//         morphTargetInfluences={nodes.Wolf3D_Head.morphTargetInfluences}
+//       />
+//       <skinnedMesh
+//         name="Wolf3D_Teeth"
+//         geometry={nodes.Wolf3D_Teeth.geometry}
+//         material={materials.Wolf3D_Teeth}
+//         skeleton={nodes.Wolf3D_Teeth.skeleton}
+//         morphTargetDictionary={nodes.Wolf3D_Teeth.morphTargetDictionary}
+//         morphTargetInfluences={nodes.Wolf3D_Teeth.morphTargetInfluences}
+//       />
+//     </group>
+//   );
+// }
+
+// // Preload 3D model
+// useGLTF.preload("/models/667909a260bbb5682042293a.glb");
+
+// export default Avatar;
+
 import React, { useState, useEffect, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
@@ -503,6 +682,7 @@ export function Avatar(props) {
   useEffect(() => {
     if (responseData) {
       const utterance = new SpeechSynthesisUtterance(responseData);
+
       utteranceRef.current = utterance;
       const generatedCues = [];
 
@@ -520,12 +700,20 @@ export function Avatar(props) {
             start,
             end,
           });
+
+          // Update the current time of the speech synthesis
+          startTimeRef.current = event.elapsedTime * 1000;
         }
       };
+      // const voices = speechSynthesis.getVoices();
+      // const googleUsEnglishVoice = voices.find(
+      //   (voice) => voice.name === "Google US English"
+      // );
 
+      // utterance.voice = googleUsEnglishVoice;
       speechSynthesisRef.current.speak(utterance);
 
-      utterance.onend = () => {
+      utterance.onstart = () => {
         setCues(generatedCues);
         console.log("Cues:", generatedCues);
       };
@@ -535,9 +723,9 @@ export function Avatar(props) {
   const { nodes, materials } = useGLTF("/models/667909a260bbb5682042293a.glb");
 
   useFrame(() => {
-    console.log("(speechSynthesisRef.current", speechSynthesisRef.current);
     if (speechSynthesisRef.current && speechSynthesisRef.current.speaking) {
-      const currentTime = speechSynthesisRef.current.currentTime * 1000;
+      const currentTime = startTimeRef.current;
+      console.log(currentTime);
 
       Object.values(corresponding).forEach((value) => {
         nodes.Wolf3D_Head.morphTargetInfluences[
@@ -554,17 +742,7 @@ export function Avatar(props) {
         const startTime = mouthCue.start;
         const endTime = mouthCue.end;
 
-        console.log("currentTime", currentTime);
-        console.log("startTime", startTime);
-        console.log("currentTime >= startTime", currentTime >= startTime);
-        console.log("currentTime <= endTime", currentTime <= endTime);
-        console.log(
-          "currentTime >= startTime && currentTime <= endTime",
-          currentTime >= startTime && currentTime <= endTime
-        );
-
         if (currentTime >= startTime && currentTime <= endTime) {
-          console.log(currentTime);
           const viseme = mouthCue.value;
 
           nodes.Wolf3D_Head.morphTargetInfluences[
@@ -646,5 +824,3 @@ export function Avatar(props) {
 
 // Preload 3D model
 useGLTF.preload("/models/667909a260bbb5682042293a.glb");
-
-export default Avatar;
