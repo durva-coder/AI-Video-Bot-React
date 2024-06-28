@@ -7,6 +7,7 @@ if ("webkitSpeechRecognition" in window) {
   recognition.interimResults = false;
   recognition.continuous = true;
   recognition.lang = "en-US";
+  // recognition.maxResults = 10;
 }
 
 const useSpeechRecognition = () => {
@@ -52,6 +53,13 @@ const useSpeechRecognition = () => {
 
     recognition.onresult = onResult;
 
+    // recognition.onend = () => {
+    //   console.log("islisten", isListening);
+    //   // if (!isListening) {
+    //   recognition.start();
+    //   // }
+    // };
+
     recognitionRef.current = recognition;
     console.log("i am calling");
 
@@ -89,21 +97,35 @@ const useSpeechRecognition = () => {
     }
   };
 
+  // const startListening = () => {
+  //   if (recognitionRef.current && !isListening) {
+  //     setTimeout(() => {
+  //       recognitionRef.current.start();
+  //       setIsListening(true);
+  //     }, 500); // Added delay of 500ms
+  //   }
+  // };
+
+  // const stopListening = () => {
+  //   if (recognitionRef.current && isListening) {
+  //     setTimeout(() => {
+  //       recognitionRef.current.stop();
+  //       setIsListening(false);
+  //     }, 500); // Added delay of 500ms
+  //   }
+  // };
+
   const startListening = () => {
     if (recognitionRef.current && !isListening) {
-      setTimeout(() => {
-        recognitionRef.current.start();
-        setIsListening(true);
-      }, 500); // Added delay of 500ms
+      recognitionRef.current.start();
+      setIsListening(true);
     }
   };
 
   const stopListening = () => {
     if (recognitionRef.current && isListening) {
-      setTimeout(() => {
-        recognitionRef.current.stop();
-        setIsListening(false);
-      }, 500); // Added delay of 500ms
+      recognitionRef.current.stop();
+      setIsListening(false);
     }
   };
 
