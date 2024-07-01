@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+// import { useSpeechRecognition } from "react-speech-recognition";
 
 let recognition = null;
 
@@ -7,10 +8,10 @@ if ("webkitSpeechRecognition" in window) {
   recognition.interimResults = false;
   recognition.continuous = true;
   recognition.lang = "en-US";
-  // recognition.maxResults = 10;
+  // recognition.maxResults = 100;
 }
 
-const useSpeechRecognition = () => {
+const useSpeechRecognition1 = () => {
   const [text, setText] = useState("");
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
@@ -42,7 +43,12 @@ const useSpeechRecognition = () => {
       console.log("esponseData.data", responseData.data);
       setResponseData(responseData.data);
       // textToSpeech(responseData.text);
+      // setIsSpeaking(true);
+
       setIsSpeaking(true);
+      setTimeout(() => {
+        setIsSpeaking(false);
+      }, 10000);
     } catch (error) {
       console.error("Error calling backend API:", error);
     }
@@ -54,10 +60,12 @@ const useSpeechRecognition = () => {
     recognition.onresult = onResult;
 
     // recognition.onend = () => {
-    //   console.log("islisten", isListening);
-    //   // if (!isListening) {
-    //   recognition.start();
-    //   // }
+    //   console.log("Recognition ended", isListening);
+    //   if (isListening) {
+    //     setTimeout(() => {
+    //       recognition.start();
+    //     }, 1000); // Retry after 1 second
+    //   }
     // };
 
     recognitionRef.current = recognition;
@@ -70,6 +78,68 @@ const useSpeechRecognition = () => {
       }
     };
   }, []);
+
+  // const [text, setText] = useState("");
+  // const [isListening, setIsListening] = useState(false);
+  // const [isSpeaking, setIsSpeaking] = useState(false);
+  // const [responseData, setResponseData] = useState("");
+  // const [error, setError] = useState(null);
+  // const { transcript, resetTranscript } = useSpeechRecognition({
+  //   onError: (error) => setError(error),
+  // });
+
+  // useEffect(() => {
+  //   console.log(transcript);
+  //   if (transcript) {
+  //     setText(transcript);
+  //   }
+  // }, [transcript]);
+
+  // useEffect(() => {
+  //   if (isListening) {
+  //     setIsListening(true);
+  //   } else {
+  //     setIsListening(false);
+  //   }
+  // }, [isListening]);
+
+  // const startListening = () => {
+  //   resetTranscript();
+  //   setIsListening(true);
+  // };
+
+  // const stopListening = () => {
+  //   setIsListening(false);
+  // };
+
+  // const onResult = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:7777/chat", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ prompt: text }),
+  //     });
+
+  //     const responseData = await response.json();
+  //     console.log("responseData.data", responseData.data);
+  //     setResponseData(responseData.data);
+
+  //     setIsSpeaking(true);
+  //     setTimeout(() => {
+  //       setIsSpeaking(false);
+  //     }, 10000);
+  //   } catch (error) {
+  //     console.error("Error calling backend API:", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (transcript && transcript !== "") {
+  //     onResult();
+  //   }
+  // }, [transcript]);
 
   const textToSpeech = (text) => {
     // Create a new utterance
@@ -135,6 +205,7 @@ const useSpeechRecognition = () => {
     startListening,
     stopListening,
     hasRecognitionSupport: !!recognition,
+    // browserSupportsSpeechRecognition,
     isSpeaking,
     setIsSpeaking,
     responseData,
@@ -142,4 +213,179 @@ const useSpeechRecognition = () => {
   };
 };
 
-export default useSpeechRecognition;
+export default useSpeechRecognition1;
+
+// import { useState, useEffect } from "react";
+// import SpeechRecognition, {
+//   useSpeechRecognition,
+// } from "react-speech-recognition";
+
+// const useSpeechRecognition1 = () => {
+//   const [text, setText] = useState("");
+//   const [isListening, setIsListening] = useState(false);
+//   const [isSpeaking, setIsSpeaking] = useState(false);
+//   const [responseData, setResponseData] = useState("");
+//   const [error, setError] = useState(null);
+
+//   const {
+//     transcript,
+//     listening,
+//     resetTranscript,
+//     browserSupportsSpeechRecognition,
+//   } = useSpeechRecognition();
+
+//   useEffect(() => {
+//     console.log("transcript", transcript);
+//     if (transcript) {
+//       setText(transcript);
+//       console.log(text);
+//     }
+//   }, [transcript]);
+
+//   const onStartListening = () => {
+//     resetTranscript();
+//     setIsListening(true);
+//     SpeechRecognition.startListening({
+//       continuous: true,
+//     });
+//   };
+
+//   const onStopListening = () => {
+//     setIsListening(false);
+//     SpeechRecognition.stopListening();
+//   };
+
+//   const onResult = async () => {
+//     try {
+//       const response = await fetch("http://localhost:7777/chat", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ prompt: transcript }), // Use transcript directly here
+//       });
+
+//       const responseData = await response.json();
+//       console.log("responseData.data", responseData.data);
+//       setResponseData(responseData.data);
+
+//       resetTranscript();
+
+//       setIsSpeaking(true);
+//       setTimeout(() => {
+//         setIsSpeaking(false);
+//       }, 10000);
+//     } catch (error) {
+//       console.error("Error calling backend API:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (transcript && transcript !== "") {
+//       onResult();
+//     }
+//   }, [transcript]);
+
+//   return {
+//     text,
+//     isListening,
+//     onStartListening,
+//     onStopListening,
+//     isSpeaking,
+//     setIsSpeaking,
+//     responseData,
+//     setResponseData,
+//     browserSupportsSpeechRecognition,
+//   };
+// };
+
+// export default useSpeechRecognition1;
+
+// import { useState, useEffect } from "react";
+// import SpeechRecognition, {
+//   useSpeechRecognition,
+// } from "react-speech-recognition";
+
+// const useSpeechRecognition1 = () => {
+//   const [text, setText] = useState("");
+//   const [isListening, setIsListening] = useState(false);
+//   const [isSpeaking, setIsSpeaking] = useState(false);
+//   const [responseData, setResponseData] = useState("");
+//   const [error, setError] = useState(null);
+
+//   const {
+//     transcript,
+//     listening,
+//     resetTranscript,
+//     browserSupportsSpeechRecognition,
+//   } = useSpeechRecognition();
+
+//   useEffect(() => {
+//     if (transcript !== "") {
+//       setText(transcript);
+//     }
+//   }, [transcript]);
+
+//   const startListening = () => {
+//     resetTranscript();
+//     setIsListening(true);
+//     SpeechRecognition.startListening({
+//       continuous: true, // Continuously listen for speech
+//     });
+//   };
+
+//   const stopListening = () => {
+//     setIsListening(false);
+//     SpeechRecognition.stopListening();
+//   };
+
+//   const onResult = async () => {
+//     try {
+//       if (text.trim() !== "") {
+//         const response = await fetch("http://localhost:7777/chat", {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json",
+//           },
+//           body: JSON.stringify({ prompt: text }), // Use text state, which contains finalized transcript
+//         });
+
+//         const responseData = await response.json();
+//         console.log("responseData.data", responseData.data);
+//         setResponseData(responseData.data);
+
+//         setIsSpeaking(true);
+//         setTimeout(() => {
+//           setIsSpeaking(false);
+//         }, 10000);
+//       }
+//     } catch (error) {
+//       console.error("Error calling backend API:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     if (text.trim() !== "") {
+//       onResult();
+//       resetTranscript(); // Reset transcript after processing
+//     }
+//   }, [text]);
+
+//   useEffect(() => {
+//     if (!listening && isListening) {
+//       startListening();
+//     }
+//   }, [listening, isListening]);
+
+//   return {
+//     text,
+//     isListening,
+//     startListening,
+//     stopListening,
+//     isSpeaking,
+//     responseData,
+//     browserSupportsSpeechRecognition,
+//   };
+// };
+
+// export default useSpeechRecognition1;

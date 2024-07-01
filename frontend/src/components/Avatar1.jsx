@@ -652,7 +652,7 @@ Command: npx gltfjsx@6.2.18 public/models/667909a260bbb5682042293a.glb -o src/co
 import React, { useState, useEffect, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import useSpeechRecognition from "../hooks/useSpeechToText/index";
+import useSpeechRecognition1 from "../hooks/useSpeechToText/index";
 
 const corresponding = {
   // A: "viseme_PP",
@@ -724,7 +724,7 @@ const corresponding = {
 };
 
 export function Avatar1(props) {
-  const { responseData } = useSpeechRecognition();
+  const { responseData } = useSpeechRecognition1();
   const [cues, setCues] = useState([]);
   const utteranceRef = useRef(null);
   const startTimeRef = useRef(0);

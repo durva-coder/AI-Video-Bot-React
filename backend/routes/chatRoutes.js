@@ -21,6 +21,8 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 router.post("/chat", async (req, res) => {
   const { prompt } = req.body;
 
+  console.log("prompt", prompt);
+
   try {
     // const response = await openai.chat.completions.create({
     //   model: "gpt-3.5-turbo-16k",
