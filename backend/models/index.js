@@ -30,7 +30,6 @@ const db = {};
 db.sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.videoBot = require("./videoBot")(sequelize, DataTypes);
 db.admin = require("./admin")(sequelize, DataTypes);
 
 db.sequelize.sync({ force: false }).then(() => {

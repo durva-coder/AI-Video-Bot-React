@@ -10,8 +10,6 @@ const signup = async (req, res) => {
   try {
     const { email, password, firstName, lastName } = req.body;
 
-    console.log(req.body);
-
     // Check if all required fields are provided
     if (!email || !password || !firstName || !lastName) {
       return res.status(400).json({ message: "Please fill all fields" });

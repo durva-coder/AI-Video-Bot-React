@@ -34,7 +34,6 @@ const LoginPage = ({ onLogin }) => {
     } catch (error) {
       console.error("Login failed:", error.response.data);
       setError(error.response.data.message);
-      //   setError("Failed to login. Please check your credentials.");
     }
   };
 

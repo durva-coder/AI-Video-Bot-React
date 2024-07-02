@@ -7,7 +7,6 @@ const LogoutButton = ({ onLogout }) => {
   const handleLogout = async () => {
     try {
       await axios.post("http://localhost:7777/admin/logout");
-      // Assuming the logout API call was successful
 
       // Clear the token from localStorage
       localStorage.removeItem("token");
@@ -15,7 +14,6 @@ const LogoutButton = ({ onLogout }) => {
       onLogout(); // Notify parent component about successful logout
     } catch (error) {
       console.error("Logout failed:", error);
-      // Handle error scenario if necessary
     }
   };
 
