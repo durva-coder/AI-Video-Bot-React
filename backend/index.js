@@ -111,7 +111,7 @@ dotenv.config();
 app.use("/", chatRoutes);
 app.use("/admin", adminRoutes);
 
-const port = process.env.port || 7777;
+const port = process.env.BACKEND_PORT || 7777;
 
 app.listen(port, () => {
   console.log("Up and running!");
