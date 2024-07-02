@@ -70,9 +70,12 @@ export function Avatar(props) {
   const morphTargetSmoothing = 0.5;
 
   useEffect(() => {
+    const ssmlText = `<speak>${responseData}</speak>`;
+
     const params = {
+      TextType: "ssml",
       OutputFormat: "mp3",
-      Text: responseData,
+      Text: ssmlText,
       VoiceId: "Brian",
     };
 
