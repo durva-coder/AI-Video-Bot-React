@@ -1,4 +1,5 @@
-import useSpeechRecognition1 from "../hooks/useSpeechToText";
+import { useSpeechRecognitionContext } from "../hooks/useSpeechToText";
+import { useEffect } from "react";
 
 const VoiceInput = () => {
   const {
@@ -8,7 +9,19 @@ const VoiceInput = () => {
     stopListening,
     hasRecognitionSupport,
     // browserSupportsSpeechRecognition,
-  } = useSpeechRecognition1(); // Correct the import path to useSpeechRecognition
+  } = useSpeechRecognitionContext(); // Correct the import path to useSpeechRecognition
+
+  useEffect(() => {
+    // This effect will run whenever `isListening` changes
+    console.log("isListening has changed:", isListening);
+
+    // Any side effects based on `isListening` can go here
+
+    // Clean up function
+    return () => {
+      // Clean up side effects here
+    };
+  }, [isListening]);
 
   return (
     <div>

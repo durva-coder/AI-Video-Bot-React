@@ -97,7 +97,11 @@ const axios = require("axios");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
+app.use(express.json({}));
+app.use(cors());
+
 const chatRoutes = require("./routes/chatRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 app.use(express.json({}));
 app.use(cors());
@@ -105,6 +109,7 @@ app.use(cors());
 dotenv.config();
 
 app.use("/", chatRoutes);
+app.use("/admin", adminRoutes);
 
 const port = process.env.port || 7777;
 

@@ -1,17 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, createContext, useContext } from "react";
 // import { useSpeechRecognition } from "react-speech-recognition";
+
+const SpeechRecognitionContext = createContext();
 
 let recognition = null;
 
 if ("webkitSpeechRecognition" in window) {
   recognition = new window.webkitSpeechRecognition();
   recognition.interimResults = false;
-  recognition.continuous = true;
+  recognition.continuous = false;
   recognition.lang = "en-US";
-  // recognition.maxResults = 100;
 }
 
-const useSpeechRecognition1 = () => {
+const SpeechRecognitionProvider = ({ children }) => {
   const [text, setText] = useState("");
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
@@ -39,16 +40,20 @@ const useSpeechRecognition1 = () => {
         body: JSON.stringify({ prompt: newText }),
       });
 
+      // console.log("is speaking");
+      setIsListening(false);
+
       const responseData = await response.json();
       console.log("esponseData.data", responseData.data);
       setResponseData(responseData.data);
+
+      // setIsSpeaking(false);
       // textToSpeech(responseData.text);
       // setIsSpeaking(true);
 
-      setIsSpeaking(true);
-      setTimeout(() => {
-        setIsSpeaking(false);
-      }, 10000);
+      // setTimeout(() => {
+      //   setIsListening(true);
+      // }, 100);
     } catch (error) {
       console.error("Error calling backend API:", error);
     }
@@ -58,15 +63,6 @@ const useSpeechRecognition1 = () => {
     if (!recognition) return;
 
     recognition.onresult = onResult;
-
-    // recognition.onend = () => {
-    //   console.log("Recognition ended", isListening);
-    //   if (isListening) {
-    //     setTimeout(() => {
-    //       recognition.start();
-    //     }, 1000); // Retry after 1 second
-    //   }
-    // };
 
     recognitionRef.current = recognition;
     console.log("i am calling");
@@ -186,6 +182,8 @@ const useSpeechRecognition1 = () => {
   // };
 
   const startListening = () => {
+    console.log("isListening start", isListening);
+
     if (recognitionRef.current && !isListening) {
       recognitionRef.current.start();
       setIsListening(true);
@@ -199,21 +197,45 @@ const useSpeechRecognition1 = () => {
     }
   };
 
-  return {
-    text,
-    isListening,
-    startListening,
-    stopListening,
-    hasRecognitionSupport: !!recognition,
-    // browserSupportsSpeechRecognition,
-    isSpeaking,
-    setIsSpeaking,
-    responseData,
-    setResponseData,
-  };
+  // return {
+  //   text,
+  //   isListening,
+  //   startListening,
+  //   stopListening,
+  //   hasRecognitionSupport: !!recognition,
+  //   // browserSupportsSpeechRecognition,
+  //   isSpeaking,
+  //   setIsSpeaking,
+  //   setIsListening,
+  //   responseData,
+  //   setResponseData,
+  // };
+
+  return (
+    <SpeechRecognitionContext.Provider
+      value={{
+        text,
+        isListening,
+        startListening,
+        stopListening,
+        hasRecognitionSupport: !!recognition,
+        isSpeaking,
+        setIsSpeaking,
+        setIsListening,
+        responseData,
+        setResponseData,
+      }}
+    >
+      {children}
+    </SpeechRecognitionContext.Provider>
+  );
 };
 
-export default useSpeechRecognition1;
+export const useSpeechRecognitionContext = () => {
+  return useContext(SpeechRecognitionContext);
+};
+
+export default SpeechRecognitionProvider;
 
 // import { useState, useEffect } from "react";
 // import SpeechRecognition, {

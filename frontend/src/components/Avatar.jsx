@@ -1253,17 +1253,17 @@ Command: npx gltfjsx@6.2.18 public/models/667d2dc7ab338d43c837c83c.glb -o src/co
 import React, { useState, useEffect, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import useSpeechRecognition1 from "../hooks/useSpeechToText/index";
+import { useSpeechRecognitionContext } from "../hooks/useSpeechToText";
 import * as THREE from "three";
 import { Polly } from "aws-sdk";
 import { Buffer } from "buffer";
 
 const polly = new Polly({
   credentials: {
-    accessKeyId: "AKIASLWIJDRLMW46KAFQ",
-    secretAccessKey: "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",
+    accessKeyId: process.env.REACT_APP_ACCESS_KEY_ID,
+    secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY,
   },
-  region: "ap-south-1",
+  region: process.env.REACT_APP_REGION,
 });
 
 const corresponding = {
@@ -1300,7 +1300,14 @@ const corresponding = {
 };
 
 export function Avatar(props) {
-  const { responseData } = useSpeechRecognition1();
+  const {
+    responseData,
+    setIsSpeaking,
+    setIsListening,
+    isSpeaking,
+    startListening,
+    setResponseData,
+  } = useSpeechRecognitionContext();
   const [cues, setCues] = useState([]);
   const startTimeRef = useRef(0);
   const [audioUrl, setAudioUrl] = useState("");
@@ -1323,16 +1330,18 @@ export function Avatar(props) {
         const audioContent = Buffer.from(data.AudioStream).toString("base64");
         const audioUrl = `data:audio/mp3;base64,${audioContent}`;
         setAudioUrl(audioUrl);
+        setResponseData("");
       }
     });
   }, [responseData]);
 
   useEffect(() => {
     if (audioUrl) {
+      setIsSpeaking(true);
       audioRef.current = new Audio(audioUrl);
       audioRef.current.play();
     }
-  }, [audioUrl]);
+  }, [audioUrl, isSpeaking, startListening]);
 
   useEffect(() => {
     if (responseData) {
