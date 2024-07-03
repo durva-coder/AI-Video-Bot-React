@@ -18,7 +18,7 @@ const LoginPage = ({ onLogin }) => {
       }
       if (email && password) {
         const response = await axios.post(
-          "http://localhost:10000/admin/login",
+          `${process.env.REACT_APP_BACKEND_URL}/admin/login`,
           {
             email,
             password,
