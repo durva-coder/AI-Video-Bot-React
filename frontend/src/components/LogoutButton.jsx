@@ -6,7 +6,7 @@ import axios from "axios";
 const LogoutButton = ({ onLogout }) => {
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:7777/admin/logout");
+      await axios.post("http://localhost:10000/admin/logout");
 
       // Clear the token from localStorage
       localStorage.removeItem("token");

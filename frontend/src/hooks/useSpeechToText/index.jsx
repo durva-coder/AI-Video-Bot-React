@@ -27,7 +27,7 @@ const SpeechRecognitionProvider = ({ children }) => {
     setText(newText);
 
     try {
-      const response = await fetch("http://localhost:7777/chat", {
+      const response = await fetch("http://localhost:10000/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

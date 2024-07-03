@@ -17,10 +17,13 @@ const LoginPage = ({ onLogin }) => {
         setError("Please fill in all fields.");
       }
       if (email && password) {
-        const response = await axios.post("http://localhost:7777/admin/login", {
-          email,
-          password,
-        });
+        const response = await axios.post(
+          "http://localhost:10000/admin/login",
+          {
+            email,
+            password,
+          }
+        );
 
         // Assuming your API responds with a success message or token upon successful login
         const token = response.data.token;
@@ -32,7 +35,7 @@ const LoginPage = ({ onLogin }) => {
         onLogin();
       }
     } catch (error) {
-      console.error("Login failed:", error.response.data);
+      // console.error("Login failed:", error.response.data);
       setError(error.response.data.message);
     }
   };
