@@ -2,9 +2,12 @@ const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
   try {
-    const token = req.cookies.access_token;
+    const token = req.headers.authorization.split(" ")[1];
+
     if (!token) {
-      return res.redirect("/admin/adminLogin");
+      return res.status(500).json({
+        message: "You are not logged in",
+      });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_KEY);
@@ -12,6 +15,8 @@ module.exports = (req, res, next) => {
     req.adminData = decoded;
     next();
   } catch (error) {
-    return res.status(401).render("loginSignup");
+    return res.status(401).json({
+      error: error,
+    });
   }
 };

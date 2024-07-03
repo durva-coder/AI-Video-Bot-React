@@ -93,10 +93,9 @@ const login = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in login:", error);
-    return res.render("loginSignup", {
-      message: "Error in login credentials",
-      err: error,
-    });
+    return res
+      .status(500)
+      .json({ error: "An error occurred while logging in" });
   }
 };
 

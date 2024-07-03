@@ -1,5 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
+const checkAuth = require("../middleware/check-auth");
 
 dotenv.config();
 
@@ -12,10 +13,13 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-router.post("/chat", async (req, res) => {
+router.post("/chat", checkAuth, async (req, res) => {
   const { prompt } = req.body;
 
   try {
+    if (!req.adminData.adminId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
