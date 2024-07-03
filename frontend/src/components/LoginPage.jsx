@@ -32,7 +32,7 @@ const LoginPage = ({ onLogin }) => {
         onLogin();
       }
     } catch (error) {
-      console.error("Login failed:", error.response.data);
+      // console.error("Login failed:", error.response.data);
       setError(error.response.data.message);
     }
   };
